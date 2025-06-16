@@ -10,6 +10,7 @@
 /node_modules
 npm-debug.log
 yarn-error.log
+package-lock.json
 
 # IDEs and editors
 .idea/
@@ -36,7 +37,12 @@ yarn-error.log
 /libpeerconnection.log
 testem.log
 /typings
+/.firebase
+/.editorconfig
 
 # System files
 .DS_Store
 Thumbs.db
+
+// configs
+/src/app/app.firebase.config.ts

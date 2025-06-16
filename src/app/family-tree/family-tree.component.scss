@@ -1,0 +1,185 @@
+:host {
+  display: block;
+  position: relative;
+  padding: 1rem;
+}
+
+/* Reset Button in Top Right Corner */
+.reset-btn {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  z-index: 1000;
+}
+
+/* Org Chart Node Styling */
+.card-node {
+  padding: 1rem;
+  background: #f4f4f4;
+  border-radius: 12px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  position: relative;
+  min-width: 180px;
+  font-size: 0.9rem;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+
+  strong {
+    display: block;
+    font-size: 1rem;
+    margin-bottom: 0.25rem;
+  }
+}
+
+/* Expand/Collapse icon */
+.expand-icon {
+  position: absolute;
+  bottom: 0.25rem;
+  right: 0.25rem;
+  font-size: 1rem;
+  cursor: pointer;
+  background: #ffffff;
+  border-radius: 50%;
+  padding: 0.2rem;
+  border: 1px solid #ccc;
+  transition: background 0.2s;
+
+  &:hover {
+    background: #e0e0e0;
+  }
+}
+
+/* Fade out animation for delete */
+.fade-out {
+  animation: fadeOut 0.5s ease forwards;
+}
+
+@keyframes fadeOut {
+  to {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+}
+
+/* Dialog Styling */
+.dialog-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  min-width: 300px;
+  max-width: 100%;
+}
+
+/* Form fields */
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  margin-bottom: 0.75rem;
+
+  label {
+    font-weight: 600;
+    font-size: 0.9rem;
+  }
+}
+
+/* Save/Add Button Group */
+.btn-save,
+.btn-add {
+  flex: 1;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .dialog-content {
+    padding: 0.5rem;
+  }
+
+  .card-node {
+    padding: 10px;
+    border: 1px solid #ccc;
+    margin: 5px;
+  }  
+
+  .expand-icon {
+    font-size: 0.9rem;
+    bottom: 0.2rem;
+    right: 0.2rem;
+  }
+}
+
+.delete-button-container {
+  margin-top: 1rem;
+  text-align: right;
+}
+
+.tree-node.highlighted {
+  border: 2px solid #007ad9;
+  box-shadow: 0 0 10px #007ad9;
+  border-radius: 8px;
+  transition: box-shadow 0.3s ease;
+}
+
+.highlight-flash {
+  animation: flash 1s;
+}
+
+@keyframes flash {
+  0% {
+    box-shadow: 0 0 15px #ff0;
+  }
+  100% {
+    box-shadow: 0 0 10px #007ad9;
+  }
+}
+
+.married-view {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+
+  .half-card {
+    flex: 1;
+    background: #eaf2ff;
+    border-radius: 8px;
+    padding: 0.5rem;
+    font-size: 0.85rem;
+  }
+}
+
+.node-tooltip {
+  max-width: 250px;
+  white-space: normal;
+  font-size: 0.85rem;
+  line-height: 1.4;
+}
+
+::ng-deep .node-tooltip {
+  max-width: 300px;
+  min-width: 200px;
+  width: 100%;
+  white-space: normal;
+  word-wrap: break-word;
+  font-size: 13px;
+  line-height: 1.4;
+  padding: 8px 10px;
+  background-color: #fff;
+  border: 1px solid #ccc;
+  color: #333;
+  box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.15);
+  border-radius: 6px;
+  word-break: break-word;
+}
+
+/* Responsive for mobile */
+@media (max-width: 600px) {
+  ::ng-deep .node-tooltip {
+    max-width: 90vw;
+    font-size: 14px;
+    padding: 12px;
+  }
+}
+
+
+
+

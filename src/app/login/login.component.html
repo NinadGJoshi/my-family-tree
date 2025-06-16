@@ -1,0 +1,64 @@
+<div class="flex justify-content-center align-items-center min-h-screen">
+  <div class="card w-full max-w-md">
+    <h2 class="text-center">{{ isSignupMode ? 'Sign Up' : 'Login' }}</h2>
+
+    <form class="p-fluid" (ngSubmit)="loginOrSignup()">
+      <div class="field">
+        <label for="email">Email</label>
+        <input 
+          id="email" 
+          type="email" 
+          pInputText 
+          [(ngModel)]="email" 
+          name="email" 
+          required />
+      </div>
+
+      <div class="field">
+        <label for="password">Password</label>
+        <input 
+          id="password" 
+          type="password" 
+          pInputText 
+          [(ngModel)]="password" 
+          name="password" 
+          required />
+      </div>
+
+      <div *ngIf="error" class="text-red-500 text-sm mt-2">{{ error }}</div>
+
+      <!-- Button is disabled when email or password is empty -->
+      <button 
+        pButton 
+        type="submit"
+        label="{{ isSignupMode ? 'Sign Up' : 'Login' }}" 
+        class="mt-3 w-full"
+        [disabled]="!email || !password">
+      </button>
+    </form>
+
+    <a class="block text-center mt-3 text-sm cursor-pointer" (click)="toggleMode()">
+      {{ isSignupMode ? 'Already have an account? Login' : "Don't have an account? Sign up" }}
+    </a>
+
+    <a class="block text-center mt-2 text-xs cursor-pointer text-blue-500" (click)="showForgot = !showForgot">
+      Forgot password?
+    </a>
+
+    <div *ngIf="showForgot" class="mt-3">
+      <input 
+        type="email" 
+        pInputText 
+        placeholder="Enter your email" 
+        [(ngModel)]="forgotEmail" 
+        class="mb-2 w-full" 
+        name="forgotEmail" />
+      <button 
+        pButton 
+        label="Send Reset Link" 
+        class="w-full" 
+        (click)="sendResetLink()">
+      </button>
+    </div>
+  </div>
+</div>

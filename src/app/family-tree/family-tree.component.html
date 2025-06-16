@@ -1,0 +1,155 @@
+<p-organizationChart [value]="data" selectionMode="single" (onNodeSelect)="onNodeClick($event)">
+  <ng-template let-node pTemplate="person">
+    <div class="card-node" [id]="node.data.name" [ngClass]="{ 'highlighted': (highlightedNode?.id) === node.name }"
+      [pTooltip]="getTooltipContent(node.data)" [escape]="false" tooltipPosition="top" tooltipStyleClass="node-tooltip"
+      (click)="onNodeTooltipClick(node)">
+      <div *ngIf="node.data.married === 'Y'; else singleView" class="married-view flex gap-4">
+        <div class="half-card text-center">
+          <ng-container *ngIf="node.data.avatar; else defaultAvatar1">
+            <img [src]="node.data.avatar" class="w-16 h-16 rounded-full mb-2" />
+          </ng-container>
+          <ng-template #defaultAvatar1>
+            <div class="w-16 h-16 rounded-full bg-gray-200 flex items-center justify-center mb-2 mx-auto">
+              <i class="pi pi-user text-xl text-gray-600"></i>
+            </div>
+          </ng-template>
+
+          <strong>{{ node.label }}</strong>
+          <div *ngIf="node.data.dob">🟢 Born On: {{ node.data.dob | date }}</div>
+          <div *ngIf="!node.data.isAlive">🔴 Died On: {{ node.data.diedOn | date }}</div>
+        </div>
+
+        <div class="half-card text-center">
+          <ng-container *ngIf="node.data.partnerAvatar; else defaultAvatar2">
+            <img [src]="node.data.partnerAvatar" class="w-16 h-16 rounded-full mb-2" />
+          </ng-container>
+          <ng-template #defaultAvatar2>
+            <div class="w-16 h-16 rounded-full bg-gray-200 flex items-center justify-center mb-2 mx-auto">
+              <i class="pi pi-user text-xl text-gray-600"></i>
+            </div>
+          </ng-template>
+
+          <strong>{{ node.data.partnerName }}</strong>
+          <div *ngIf="node.data.partnerDob">🟢 Born On: {{ node.data.partnerDob | date }}</div>
+          <div *ngIf="!node.data.partnerIsAlive && node.data.partnerDiedOn">🔴 Died On: {{ node.data.partnerDiedOn |
+            date }}</div>
+        </div>
+      </div>
+
+      <ng-template #singleView>
+        <div class="text-center">
+          <ng-container *ngIf="node.data.avatar; else defaultSoloAvatar">
+            <img [src]="node.data.avatar" class="w-16 h-16 rounded-full mb-2" />
+          </ng-container>
+          <ng-template #defaultSoloAvatar>
+            <div class="w-16 h-16 rounded-full bg-gray-200 flex items-center justify-center mb-2 mx-auto">
+              <i class="pi pi-user text-xl text-gray-600"></i>
+            </div>
+          </ng-template>
+
+          <strong>{{ node.label }} 👤</strong>
+          <div *ngIf="node.data.dob">🟢 Born On: {{ node.data.dob | date }}</div>
+          <div *ngIf="!node.data.isAlive && node.data.diedOn">🔴 Died On: {{ node.data.diedOn | date }}</div>
+        </div>
+      </ng-template>
+    </div>
+  </ng-template>
+</p-organizationChart>
+
+<p-dialog header="Family Member Details" [(visible)]="displayDialog" [modal]="true">
+  <div class="dialog-content">
+    <div>
+      <button pButton label="Edit/Add Details" (click)="toggleEditForm()" *ngIf="!showForm"></button>
+    </div>
+
+    <div *ngIf="showForm" class="form-container">
+      <div class="field">
+        <label>Name</label>
+        <input pInputText [(ngModel)]="form.name" />
+      </div>
+
+      <div class="field">
+        <label>Gender</label>
+        <p-selectButton [options]="genders" [(ngModel)]="form.gender" optionLabel="label"
+          optionValue="value"></p-selectButton>
+      </div>
+
+      <div class="field">
+        <label>Date of Birth</label>
+        <p-calendar [(ngModel)]="form.dob" dateFormat="yy-mm-dd"></p-calendar>
+      </div>
+
+      <div class="field">
+        <label>Is Alive?</label>
+        <div class="flex gap-2">
+          <p-radioButton name="isAlive" [value]="true" [(ngModel)]="form.isAlive" inputId="aliveYes"></p-radioButton>
+          <label for="aliveYes">Yes</label>
+          <p-radioButton name="isAlive" [value]="false" [(ngModel)]="form.isAlive" inputId="aliveNo"></p-radioButton>
+          <label for="aliveNo">No</label>
+        </div>
+      </div>
+
+      <div class="field" *ngIf="form.isAlive === false">
+        <label>Died On</label>
+        <p-calendar [(ngModel)]="form.diedOn" dateFormat="yy-mm-dd"></p-calendar>
+      </div>
+
+      <div class="field">
+        <label>Married</label>
+        <div class="flex gap-2 align-items-center">
+          <p-radioButton name="married" value="Y" [(ngModel)]="form.married" inputId="marriedYes"></p-radioButton>
+          <label for="marriedYes">Y</label>
+          <p-radioButton name="married" value="N" [(ngModel)]="form.married" inputId="marriedNo"></p-radioButton>
+          <label for="marriedNo">N</label>
+        </div>
+      </div>
+
+      <div class="field" *ngIf="form.married === 'Y'">
+        <label>Partner Name</label>
+        <input pInputText [(ngModel)]="form.partnerName" />
+
+        <label>Partner DOB</label>
+        <p-calendar [(ngModel)]="form.partnerDob" dateFormat="yy-mm-dd"></p-calendar>
+
+        <label>Partner Alive?</label>
+        <div class="flex gap-2">
+          <p-radioButton name="partnerIsAlive" [value]="true" [(ngModel)]="form.partnerIsAlive"
+            inputId="partnerAliveYes"></p-radioButton>
+          <label for="partnerAliveYes">Yes</label>
+          <p-radioButton name="partnerIsAlive" [value]="false" [(ngModel)]="form.partnerIsAlive"
+            inputId="partnerAliveNo"></p-radioButton>
+          <label for="partnerAliveNo">No</label>
+        </div>
+
+        <div class="field" *ngIf="form.partnerIsAlive === false">
+          <label>Partner Died On</label>
+          <p-calendar [(ngModel)]="form.partnerDiedOn" dateFormat="yy-mm-dd"></p-calendar>
+        </div>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Add As</label>
+      <p-selectButton [options]="relationTypes" [(ngModel)]="addingRelation" optionLabel="label"
+        optionValue="value"></p-selectButton>
+    </div>
+
+    <div class="flex flex-wrap gap-2 justify-between mt-4">
+      <div class="flex gap-2">
+        <button pButton label="Save Details" class="btn-save" (click)="saveDetails()"
+          [disabled]="!isFormChanged()"></button>
+        <button pButton label="Add Member" class="btn-add" (click)="addFamilyMember()" [disabled]="!form.name"></button>
+      </div>
+      <button *ngIf="selectedNode && getTotalNodeCount(data) > 1" pButton label="Delete" icon="pi pi-trash"
+        class="p-button-danger" (click)="deleteNode(selectedNode)" pTooltip="Delete Node"
+        tooltipPosition="top"></button>
+    </div>
+  </div>
+</p-dialog>
+
+<p-dialog header="Details" [(visible)]="tooltipDialogVisible" [modal]="true" [style]="{width: '350px'}"
+  [baseZIndex]="10000" *ngIf="tooltipData">
+  <div [innerHTML]="getTooltipContent(tooltipData)"></div>
+</p-dialog>
+
+<p-confirmDialog></p-confirmDialog>
