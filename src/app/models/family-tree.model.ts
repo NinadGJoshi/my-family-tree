@@ -32,4 +32,5 @@ export interface OrganizationChartNode {
     expanded?: boolean;
     data?: FamilyMemberForm;
     children?: OrganizationChartNode[];
+    isRootNode: boolean;
 }
