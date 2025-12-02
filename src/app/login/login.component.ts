@@ -31,6 +31,10 @@ export class LoginComponent implements OnInit {
     {
       label: 'हिन्दी',
       value: 'hn'
+    },
+    {
+      label: 'मराठी',
+      value: 'mr'
     }
   ];
   selectedLangCode: string = 'en';
