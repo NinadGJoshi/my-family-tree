@@ -1,10 +1,12 @@
-import { Component, OnDestroy, ViewChild } from '@angular/core';
+import { Component, ViewChild, OnInit } from '@angular/core';
 import { FamilyTreeComponent } from "../family-tree/family-tree.component";
 import { AuthService } from '../auth.service';
 import { Router } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { Observable, of, take, tap } from 'rxjs';
+import { ContentService } from '../content.service';
 
 @Component({
   selector: 'app-home',
@@ -12,12 +14,38 @@ import { CommonModule } from '@angular/common';
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss'
 })
-export class HomeComponent {
+export class HomeComponent implements OnInit {
   searchMatches: Element[] = [];
   currentMatchIndex?: number;
-  constructor(private authService: AuthService, private router: Router) { }
-  @ViewChild(FamilyTreeComponent) familyTreeComponent!: FamilyTreeComponent;
   searchQuery: string = '';
+  selectedLangCode: string = 'en';
+  homeContentPage$: Observable<any> | undefined;
+  currentTranslations: any = {};
+
+  @ViewChild(FamilyTreeComponent) familyTreeComponent!: FamilyTreeComponent;
+
+  constructor(
+    private authService: AuthService,
+    private router: Router,
+    private contentService: ContentService
+  ) { }
+
+  ngOnInit(): void {
+    this.loadTranslations();
+  }
+
+  private loadTranslations(): void {
+    this.contentService.getTranslations()
+      .pipe(
+        tap(translations => {
+          this.currentTranslations = translations;
+          this.homeContentPage$ = of(translations);
+        }),
+        take(1)
+      )
+      .subscribe();
+  }
+
   logout() {
     this.familyTreeComponent.syncTree();
     this.authService.logout();
@@ -53,10 +81,7 @@ export class HomeComponent {
         const json = JSON.parse(reader.result as string);
         if (!Array.isArray(json)) throw new Error();
 
-        // Load into UI
         this.familyTreeComponent.loadTreeFromJson(json);
-
-        // Save to Firebase
         const userId = this.authService.getCurrentUserId();
         if (userId) {
           await this.authService.saveTreeData(userId, json);
@@ -86,7 +111,6 @@ export class HomeComponent {
     this.scrollToMatch(this.currentMatchIndex ? this.currentMatchIndex : 0);
   }
 
-
   scrollToMatch(index: number) {
     const element: Element = this.searchMatches[this.currentMatchIndex ? this.currentMatchIndex : 0];
     this.familyTreeComponent.scrollToNode(element);
@@ -95,7 +119,7 @@ export class HomeComponent {
   nextMatch() {
     if (this.searchMatches.length > 1) {
       this.currentMatchIndex =
-        (this.currentMatchIndex ? this.currentMatchIndex : 0 + 1) % this.searchMatches.length;
+        ((this.currentMatchIndex ?? 0) + 1) % this.searchMatches.length;
       this.scrollToMatch(this.currentMatchIndex);
     }
   }
@@ -103,7 +127,7 @@ export class HomeComponent {
   prevMatch() {
     if (this.searchMatches.length > 1) {
       this.currentMatchIndex =
-        (this.currentMatchIndex ? this.currentMatchIndex : 0 - 1 + this.searchMatches.length) %
+        ((this.currentMatchIndex ?? 0) - 1 + this.searchMatches.length) %
         this.searchMatches.length;
       this.scrollToMatch(this.currentMatchIndex);
     }
