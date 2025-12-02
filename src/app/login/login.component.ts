@@ -1,17 +1,21 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
 import { AuthService } from '../auth.service';
 import { CommonModule } from '@angular/common';
+import { SelectButtonChangeEvent, SelectButtonModule } from 'primeng/selectbutton';
+import { ContentService } from '../content.service';
+import { Observable, of } from 'rxjs';
+import { take, tap } from 'rxjs/operators';
 
 @Component({
   selector: 'app-login',
   templateUrl: './login.component.html',
-  imports: [CommonModule, FormsModule, ButtonModule],
+  imports: [CommonModule, FormsModule, ButtonModule, SelectButtonModule],
   styleUrls: ['./login.component.scss']
 })
-export class LoginComponent {
+export class LoginComponent implements OnInit {
   email = '';
   password = '';
   isSignupMode = false;
@@ -19,7 +23,27 @@ export class LoginComponent {
   showForgot = false;
   error = '';
 
-  constructor(private authService: AuthService, private router: Router) { }
+  langOptions: any[] = [
+    {
+      label: 'English',
+      value: 'en'
+    },
+    {
+      label: 'हिन्दी',
+      value: 'hn'
+    }
+  ];
+  selectedLangCode: string = 'en';
+  loginPageContent$: Observable<any> | undefined;
+  currentTranslations: any = {};
+
+  constructor(private authService: AuthService, private router: Router, private contentService: ContentService) { }
+
+  ngOnInit(): void {
+    this.loginPageContent$ = this.contentService.getTranslations().pipe(
+      tap(translations => (this.currentTranslations = translations))
+    );
+  }
 
   toggleMode() {
     this.isSignupMode = !this.isSignupMode;
@@ -66,17 +90,26 @@ export class LoginComponent {
 
   // Utility function to map error codes to user-friendly messages
   getErrorMessage(errorCode: string): string {
+    const t = this.currentTranslations;
     switch (errorCode) {
       case 'auth/invalid-email':
-        return 'Please enter a valid email address.';
+        return t['auth_invalid_email'] || 'Please enter a valid email address.';
       case 'auth/user-not-found':
-        return 'No user found with this email address.';
+        return t['auth_user_not_found'] || 'No user found with this email address.';
       case 'auth/wrong-password':
-        return 'Incorrect password. Please try again.';
+        return t['auth_wrong_password'] || 'Incorrect password. Please try again.';
       case 'auth/email-already-in-use':
-        return 'This email is already registered. Try logging in.';
+        return t['auth_email_already_in_use'] || 'This email is already registered. Try logging in.';
       default:
-        return 'An unexpected error occurred. Please try again later.';
+        return t['auth_unexpected_error'] || 'An unexpected error occurred. Please try again later.';
     }
+  }
+
+  getSelectedLangCode($event: SelectButtonChangeEvent) {
+    this.selectedLangCode, this.contentService.selectedLangCode = $event.value;
+    this.contentService.getTranslations().pipe(
+      tap(translations => (this.loginPageContent$ = of(translations), this.currentTranslations = translations)),
+      take(1)
+    ).subscribe();
   }
 }

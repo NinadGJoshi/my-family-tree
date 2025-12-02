@@ -1,80 +1,86 @@
-<div class="main-container flex flex-col">
-  <header class="bg-blue-700 fixed top-0 w-full px-4 py-3 flex flex-wrap items-center justify-between z-10">
-    <!-- Left section: Title -->
-    <div class="flex items-center gap-3 flex-wrap">
-      <div class="text-primary-50 font-bold text-lg">
-        My Family Tree
+<ng-container *ngIf="(homeContentPage$ | async) as t">
+  <div class="main-container flex flex-col">
+    <header class="bg-blue-700 fixed top-0 w-full px-4 py-3 flex flex-wrap items-center justify-between z-10">
+      <!-- Left section: Title -->
+      <div class="flex items-center gap-3 flex-wrap">
+        <div class="text-primary-50 font-bold text-lg">
+          {{ t['mft_my_family_tree'] }}
+        </div>
       </div>
-    </div>
 
-    <!-- Right section: Buttons -->
-    <div class="flex justify-end items-center gap-x-3 mt-3 md:mt-0">
-      <div class="p-inputgroup max-w-md mx-auto">
-        <input 
-          type="text" 
-          pInputText 
-          [(ngModel)]="searchQuery" 
-          placeholder="Search by name..."
-          class="border border-gray-300 rounded px-2 py-1 text-sm" 
-          (keydown.enter)="searchNode()"
-        />
-  
-        <button 
-          *ngIf="searchQuery" 
-          pButton 
-          icon="pi pi-times" 
-          class="p-button-link p-button-sm" 
-          (click)="clearSearch()"
-          title="Clear">
+      <!-- Right section: Buttons -->
+      <div class="flex justify-end items-center gap-x-3 mt-3 md:mt-0">
+        <div class="p-inputgroup max-w-md mx-auto">
+          <input
+            type="text"
+            pInputText
+            [(ngModel)]="searchQuery"
+            [placeholder]="t['mft_search_by_name']"
+            class="border border-gray-300 rounded px-2 py-1 text-sm"
+            (keydown.enter)="searchNode()"
+          />
+
+          <button
+            *ngIf="searchQuery"
+            pButton
+            icon="pi pi-times"
+            class="p-button-link p-button-sm"
+            (click)="clearSearch()"
+            [title]="t['mft_clear']"
+          ></button>
+
+          <button
+            pButton
+            icon="pi pi-search"
+            class="p-button-link p-button-sm"
+            (click)="searchNode()"
+            [title]="t['mft_search']"
+          ></button>
+
+          <button
+            *ngIf="searchMatches.length > 1"
+            pButton
+            icon="pi pi-angle-double-left"
+            class="p-button-link p-button-sm"
+            (click)="prevMatch()"
+            [title]="t['mft_previous_match']"
+          ></button>
+
+          <button
+            *ngIf="searchMatches.length > 1"
+            pButton
+            icon="pi pi-angle-double-right"
+            class="p-button-link p-button-sm"
+            (click)="nextMatch()"
+            [title]="t['mft_next_match']"
+          ></button>
+        </div>
+
+        <button pButton class="p-button-sm p-button-secondary flex items-center gap-2" (click)="downloadTreeAsJson()">
+          <i class="pi pi-download"></i>
+          <span>{{ t['mft_download'] }}</span>
         </button>
-  
-        <button 
-          pButton 
-          icon="pi pi-search" 
-          class="p-button-link p-button-sm" 
-          (click)="searchNode()"
-          title="Search">
+
+        <input type="file" accept=".json" hidden #fileInput (change)="onFileSelected($event)" />
+        <button pButton class="p-button-sm p-button-secondary flex items-center gap-2" (click)="fileInput.click()">
+          <i class="pi pi-upload"></i>
+          <span>{{ t['mft_upload'] }}</span>
         </button>
-  
-        <button 
-          *ngIf="searchMatches['length'] > 1" 
-          pButton 
-          icon="pi pi-angle-double-left" 
-          class="p-button-link p-button-sm" 
-          (click)="prevMatch()" 
-          title="Previous Match">
-        </button>
-  
-        <button 
-          *ngIf="searchMatches['length'] > 1" 
-          pButton 
-          icon="pi pi-angle-double-right" 
-          class="p-button-link p-button-sm" 
-          (click)="nextMatch()" 
-          title="Next Match">
-        </button>
+
+        <button
+          pButton
+          [label]="t['mft_logout']"
+          (click)="logout()"
+          class="p-button-sm p-button-danger"
+        ></button>
       </div>
-      
-      <button pButton class="p-button-sm p-button-secondary flex items-center gap-2" (click)="downloadTreeAsJson()">
-        <i class="pi pi-download"></i>
-        <span>Download</span>
-      </button>
+    </header>
 
-      <input type="file" accept=".json" hidden #fileInput (change)="onFileSelected($event)" />
-      <button pButton class="p-button-sm p-button-secondary flex items-center gap-2" (click)="fileInput.click()">
-        <i class="pi pi-upload"></i>
-        <span>Upload</span>
-      </button>
+    <!-- Spacing to offset fixed header -->
+    <div class="pt-20"></div>
 
-      <button pButton label="Logout" (click)="logout()" class="p-button-sm p-button-danger">
-      </button>
+    <div class="tree-component-wrapper">
+      <family-tree></family-tree>
     </div>
-  </header>
-
-  <!-- Spacing to offset fixed header -->
-  <div class="pt-20"></div>
-
-  <div class="tree-component-wrapper">
-    <family-tree></family-tree>
   </div>
-</div>
+</ng-container>

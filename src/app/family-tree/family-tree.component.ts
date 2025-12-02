@@ -16,6 +16,9 @@ import { ActivatedRoute } from '@angular/router';
 import { getDatabase, ref, set, onValue } from 'firebase/database';
 import { initializeApp } from 'firebase/app';
 import { firebaseConfig } from '../app.firebase.config';
+import { ContentService } from '../content.service';
+import { Observable } from 'rxjs';
+import { tap } from 'rxjs/operators';
 
 @Component({
   selector: 'family-tree',
@@ -47,6 +50,15 @@ export class FamilyTreeComponent implements OnInit {
   syncing = false;
   online = navigator.onLine;
 
+  // translations observable + shortcut object for template
+  contentPage$!: Observable<any>;
+  t: any = {};
+
+  // localized action labels (Add Parent / Add Sibling / Add Child)
+  addParentLabel: string = 'Add Parent';
+  addSiblingLabel: string = 'Add Sibling';
+  addChildLabel: string = 'Add Child';
+
   private db = getDatabase(initializeApp(firebaseConfig));
 
   form: FamilyMemberForm = {
@@ -63,11 +75,8 @@ export class FamilyTreeComponent implements OnInit {
     relation: Relation.Child
   };
 
-  relationTypes = [
-    { label: 'Parent', value: 'parent' },
-    { label: 'Sibling', value: 'sibling' },
-    { label: 'Child', value: 'child' }
-  ];
+  // relationTypes will be localized in setLocalizedLabels()
+  relationTypes: Array<{ label: string; value: string }> = [];
 
   genders = [
     { label: 'Male', value: 'male' },
@@ -83,12 +92,22 @@ export class FamilyTreeComponent implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private confirmationService: ConfirmationService,
-    private renderer: Renderer2
+    private renderer: Renderer2,
+    private contentService: ContentService
   ) {
     window.addEventListener('online', () => this.syncPendingChanges());
   }
 
   ngOnInit(): void {
+    // Load translations (non-blocking); when translations arrive, set localized labels.
+    this.contentPage$ = this.contentService.getTranslations().pipe(
+      tap(translations => {
+        this.t = translations || {};
+        this.setLocalizedLabels();
+      })
+    );
+
+    // existing initialization logic (unchanged)
     const treeData = this.route.snapshot.data['treeData'];
     this.data = treeData ? treeData : this.getDefaultTree();
     localStorage.setItem('familyTree', JSON.stringify(this.data));
@@ -96,6 +115,30 @@ export class FamilyTreeComponent implements OnInit {
     window.addEventListener('resize', () => {
       this.isDesktop = window.innerWidth > 768;
     });
+  }
+
+  /**
+   * Populate localized labels for relation types and add-* actions.
+   * Uses translation keys if present, otherwise falls back to sensible defaults.
+   */
+  private setLocalizedLabels(): void {
+    const tr = this.t || {};
+
+    // Relation option labels (for the selectButton)
+    const parentLabel = tr['mft_parent'] || 'Parent';
+    const siblingLabel = tr['mft_sibling'] || 'Sibling';
+    const childLabel = tr['mft_child'] || 'Child';
+
+    this.relationTypes = [
+      { label: parentLabel, value: 'parent' },
+      { label: siblingLabel, value: 'sibling' },
+      { label: childLabel, value: 'child' }
+    ];
+
+    // Add action labels: prefer dedicated mft_add_* keys if available
+    this.addParentLabel = tr['mft_add_parent'] || `Add ${parentLabel}`;
+    this.addSiblingLabel = tr['mft_add_sibling'] || `Add ${siblingLabel}`;
+    this.addChildLabel = tr['mft_add_child'] || `Add ${childLabel}`;
   }
 
   getDefaultTree(): OrganizationChartNode[] {
@@ -253,9 +296,16 @@ export class FamilyTreeComponent implements OnInit {
     const totalNodes = this.getTotalNodeCount(this.data);
     if (totalNodes <= 1) return;
 
+    // Use translated confirmation strings if available, fallback to English
+    const confirmMessage = this.t && this.t['mft_delete_node']
+      ? `${this.t['mft_delete_node']} ${node.label}?`
+      : `Are you sure you want to delete ${node.label}?`;
+
+    const confirmHeader = this.t && this.t['mft_delete'] ? this.t['mft_delete'] : 'Delete Confirmation';
+
     this.confirmationService.confirm({
-      message: `Are you sure you want to delete ${node.label}?`,
-      header: 'Delete Confirmation',
+      message: confirmMessage,
+      header: confirmHeader,
       icon: 'pi pi-exclamation-triangle',
       accept: () => {
         this.animateAndDeleteNode(node);
@@ -398,21 +448,31 @@ export class FamilyTreeComponent implements OnInit {
   }
 
   getTooltipContent(data: FamilyMemberForm): string {
+    // Use translation keys where possible; fallback to English phrases
+    const nameLabel = this.t?.mft_name ? `${this.t.mft_name}: ` : '';
+    const dobLabel = this.t?.mft_dob ? `${this.t.mft_dob}: ` : 'DOB: ';
+    const statusLabel = this.t?.mft_is_alive ? `${this.t.mft_is_alive}: ` : 'Status: ';
+    const diedOnLabel = this.t?.mft_died_on ? `${this.t.mft_died_on}: ` : 'Died On: ';
+    const marriedLabel = this.t?.mft_married ? `${this.t.mft_married}: ` : 'Married: ';
+    const partnerLabel = this.t?.mft_partner ? `${this.t.mft_partner}: ` : 'Partner: ';
+    const partnerDobLabel = this.t?.mft_partner_dob ? `${this.t.mft_partner_dob}: ` : 'Partner DOB: ';
+    const partnerStatusLabel = this.t?.mft_partner_alive ? `${this.t.mft_partner_alive}: ` : 'Partner Status: ';
+
     return `
-    <div>
-      <div><b>${data.name}</b></div>
-      <div>DOB: ${data.dob || '-'}</div>
-      <div>Status: ${data.isAlive ? 'Alive' : 'Deceased'}</div>
-      ${!data.isAlive && data.diedOn ? `<div>Died On: ${data.diedOn}</div>` : ''}
-      <div>Married: ${data.married === 'Y' ? 'Yes' : 'No'}</div>
-      ${data.married === 'Y' ? `
-        <div><b>Partner:</b> ${data.partnerName || '-'}</div>
-        <div>Partner DOB: ${data.partnerDob || '-'}</div>
-        <div>Partner Status: ${data.partnerIsAlive ? 'Alive' : 'Deceased'}</div>
-        ${!data.partnerIsAlive && data.partnerDiedOn ? `<div>Partner Died On: ${data.partnerDiedOn}</div>` : ''}
-      ` : ''}
-    </div>
-  `;
+      <div>
+        <div><b>${data.name}</b></div>
+        <div>${dobLabel}${data.dob || '-'}</div>
+        <div>${statusLabel}${data.isAlive ? (this.t?.mft_alive ?? 'Alive') : (this.t?.mft_dead ?? 'Deceased')}</div>
+        ${!data.isAlive && data.diedOn ? `<div>${diedOnLabel}${data.diedOn}</div>` : ''}
+        <div>${marriedLabel}${data.married === 'Y' ? (this.t?.mft_yes ?? 'Yes') : (this.t?.mft_no ?? 'No')}</div>
+        ${data.married === 'Y' ? `
+          <div><b>${partnerLabel}</b> ${data.partnerName || '-'}</div>
+          <div>${partnerDobLabel}${data.partnerDob || '-'}</div>
+          <div>${partnerStatusLabel}${data.partnerIsAlive ? (this.t?.mft_alive ?? 'Alive') : (this.t?.mft_dead ?? 'Deceased')}</div>
+          ${!data.partnerIsAlive && data.partnerDiedOn ? `<div>${diedOnLabel}${data.partnerDiedOn}</div>` : ''}
+        ` : ''}
+      </div>
+    `;
   }
 
   onNodeTooltipClick(node: OrganizationChartNode) {
