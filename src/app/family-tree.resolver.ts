@@ -28,6 +28,7 @@ export class FamilyTreeResolver implements Resolve<OrganizationChartNode[]> {
           label: 'Root Person',
           type: 'person',
           styleClass: 'p-person',
+          isRootNode: true,
           expanded: true,
           data: {
             name: 'Root Person',

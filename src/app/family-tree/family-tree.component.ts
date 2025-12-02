@@ -151,6 +151,7 @@ export class FamilyTreeComponent implements OnInit {
         type: 'person',
         styleClass: 'p-person',
         expanded: true,
+        isRootNode: true,
         data: {
           name: 'Root Person',
           gender: Gender.Male,
@@ -206,10 +207,8 @@ export class FamilyTreeComponent implements OnInit {
     };
 
     if (this.selectedNode) {
-      const isRootNode: boolean = !this.findParent(this.data, this.selectedNode);
-      if (isRootNode) {
-        this.setLocalizedLabels(true);
-      }
+      const isRootNode: boolean = this.selectedNode.isRootNode;
+      this.setLocalizedLabels(isRootNode);
     }
     this.displayDialog = true;
     this.isEditMode = false;
@@ -275,6 +274,7 @@ export class FamilyTreeComponent implements OnInit {
       styleClass: 'p-person',
       expanded: true,
       data: formCopy,
+      isRootNode: false,
       children: []
     };
 
@@ -286,11 +286,14 @@ export class FamilyTreeComponent implements OnInit {
       case 'sibling':
         const parent = this.findParent(this.data, this.selectedNode);
         parent ? parent.children?.push(newNode) : this.data.push(newNode);
+        this.selectedNode.isRootNode = false;
         break;
       case 'parent':
         const index = this.data.indexOf(this.selectedNode);
         if (index > -1) this.data.splice(index, 1);
         newNode.children = [this.selectedNode];
+        this.selectedNode.isRootNode = false;
+        newNode.isRootNode = true;
         this.data.push(newNode);
         break;
     }
