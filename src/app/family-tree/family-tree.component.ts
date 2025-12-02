@@ -121,7 +121,7 @@ export class FamilyTreeComponent implements OnInit {
    * Populate localized labels for relation types and add-* actions.
    * Uses translation keys if present, otherwise falls back to sensible defaults.
    */
-  private setLocalizedLabels(): void {
+  private setLocalizedLabels(isRootNode: boolean = false): void {
     const tr = this.t || {};
 
     // Relation option labels (for the selectButton)
@@ -129,7 +129,10 @@ export class FamilyTreeComponent implements OnInit {
     const siblingLabel = tr['mft_sibling'] || 'Sibling';
     const childLabel = tr['mft_child'] || 'Child';
 
-    this.relationTypes = [
+    this.relationTypes = isRootNode ? [
+      { label: parentLabel, value: 'parent' },
+      { label: childLabel, value: 'child' }
+    ] : [
       { label: parentLabel, value: 'parent' },
       { label: siblingLabel, value: 'sibling' },
       { label: childLabel, value: 'child' }
@@ -202,6 +205,12 @@ export class FamilyTreeComponent implements OnInit {
       relation: Relation.Child
     };
 
+    if (this.selectedNode) {
+      const isRootNode: boolean = !this.findParent(this.data, this.selectedNode);
+      if (isRootNode) {
+        this.setLocalizedLabels(true);
+      }
+    }
     this.displayDialog = true;
     this.isEditMode = false;
     this.showForm = false;
@@ -237,15 +246,15 @@ export class FamilyTreeComponent implements OnInit {
     const updated = { ...this.form };
 
     // Convert Date objects to ISO strings or null
-    updated.dob = updated.dob ? new Date(updated.dob).toISOString() : null;
-    updated.diedOn = updated.isAlive ? null : (updated.diedOn ? new Date(updated.diedOn).toISOString() : null);
-    updated.partnerDob = updated.partnerDob ? new Date(updated.partnerDob).toISOString() : null;
-    updated.partnerDiedOn = updated.partnerIsAlive ? null : (updated.partnerDiedOn ? new Date(updated.partnerDiedOn).toISOString() : null);
+    updated.dob = updated.dob ? this.convertToYYYYMMDD(updated.dob) : null;
+    updated.diedOn = updated.isAlive ? null : (updated.diedOn ? this.convertToYYYYMMDD(updated.diedOn) : null);
+    updated.partnerDob = updated.partnerDob ? this.convertToYYYYMMDD(updated.partnerDob) : null;
+    updated.partnerDiedOn = updated.partnerIsAlive ? null : (updated.partnerDiedOn ? this.convertToYYYYMMDD(updated.partnerDiedOn) : null);
 
     this.selectedNode.label = updated.name ? updated.name : undefined;
     this.selectedNode.data = updated;
 
-    this.syncTree();
+    localStorage.setItem('familyTree', JSON.stringify(this.data));
     this.showForm = false;
     this.isEditMode = false;
     this.closeDialog();
@@ -485,4 +494,21 @@ export class FamilyTreeComponent implements OnInit {
   isTouchDevice(): boolean {
     return 'ontouchstart' in window || navigator.maxTouchPoints > 0;
   }
+
+  private convertToYYYYMMDD(dateInput: string | Date): string {
+    if (!dateInput) {
+      return '';
+    }
+    const date = new Date(dateInput);
+    if (isNaN(date.getTime())) {
+      console.error("Invalid Date input provided:", dateInput);
+      return '';
+    }
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  }
+
+
 }
