@@ -1,12 +1,13 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, of, catchError, tap } from 'rxjs';
+import { firebaseConfig } from './app.firebase.config';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ContentService {
-  private baseUrl = 'https://myfamilytree-66274-default-rtdb.asia-southeast1.firebasedatabase.app/locale';
+  private baseUrl = firebaseConfig.databaseURL + '/locale';
   private cachedTranslations: Record<string, any> = {};
   public selectedLangCode: string = 'en';
 
