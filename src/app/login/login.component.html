@@ -18,24 +18,12 @@
 
         <div *ngIf="error" class="text-red-500 text-sm mt-2">{{ error }}</div>
 
-        <p-selectbutton
-          [options]="langOptions"
-          [(ngModel)]="selectedLangCode"
-          #selectedLangCode
-          optionLabel="label"
-          (onChange)="getSelectedLangCode($event)"
-          optionValue="value"
-          size="large"
-          required
-        ></p-selectbutton>
+        <p-selectbutton [options]="langOptions" [(ngModel)]="selectedLangCode" optionLabel="label"
+          (onChange)="getSelectedLangCode($event)" optionValue="value" size="large" name="language"
+          required></p-selectbutton>
 
-        <button
-          pButton
-          type="submit"
-          [label]="isSignupMode ? t['mft_signup'] : t['mft_login']"
-          class="mt-3 w-full"
-          [disabled]="!email || !password"
-        ></button>
+        <button pButton type="submit" [label]="isSignupMode ? t['mft_signup'] : t['mft_login']" class="mt-3 w-full"
+          [disabled]="!email || !password"></button>
       </form>
 
       <a class="block text-center mt-3 text-sm cursor-pointer" (click)="toggleMode()">
@@ -47,14 +35,8 @@
       </a>
 
       <div *ngIf="showForgot" class="mt-3">
-        <input
-          type="email"
-          pInputText
-          [placeholder]="t['mft_email']"
-          [(ngModel)]="forgotEmail"
-          class="mb-2 w-full"
-          name="forgotEmail"
-        />
+        <input type="email" pInputText [placeholder]="t['mft_email']" [(ngModel)]="forgotEmail" class="mb-2 w-full"
+          name="forgotEmail" />
         <button pButton [label]="t['mft_send_reset_link']" class="w-full" (click)="sendResetLink()"></button>
       </div>
     </div>
