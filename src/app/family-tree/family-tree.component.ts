@@ -15,10 +15,10 @@ import { TooltipModule } from 'primeng/tooltip';
 import { ActivatedRoute } from '@angular/router';
 import { getDatabase, ref, set, onValue } from 'firebase/database';
 import { initializeApp } from 'firebase/app';
-import { firebaseConfig } from '../app.firebase.config';
 import { ContentService } from '../content.service';
 import { Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
+import { firebaseProdConfig } from '../config/firebase-prod.config';
 
 @Component({
   selector: 'family-tree',
@@ -59,7 +59,7 @@ export class FamilyTreeComponent implements OnInit {
   addSiblingLabel: string = 'Add Sibling';
   addChildLabel: string = 'Add Child';
 
-  private db = getDatabase(initializeApp(firebaseConfig));
+  private db = getDatabase(initializeApp(firebaseProdConfig));
 
   form: FamilyMemberForm = {
     name: '',
