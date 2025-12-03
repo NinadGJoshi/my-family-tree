@@ -1,8 +1,10 @@
-<div class="not-found-container" *ngIf="true" [@fadeIn]>
-    <div class="text-center">
-        <h1 class="text-5xl font-bold text-red-500">404</h1>
-        <h2 class="text-2xl text-gray-700">Oops! Page not found</h2>
-        <p class="text-lg text-gray-500">Sorry, we couldn't find the page you're looking for.</p>
-        <a routerLink="/" class="btn btn-primary mt-4" (click)="gotoHomePage()">Go to Home</a>
+<ng-container *ngIf="(translations$ | async) as t">
+    <div class="not-found-container" [@fadeIn]>
+        <div class="text-center">
+            <h1 class="text-5xl font-bold text-red-500">{{ t['mft_page_not_found_code'] || '404' }}</h1>
+            <h2 class="text-2xl text-gray-700">{{ t['mft_page_not_found_title'] || 'Oops! Page not found' }}</h2>
+            <p class="text-lg text-gray-500">{{ t['mft_page_not_found_desc'] || 'Sorry, we couldn\'t find the page you\'re looking for.' }}</p>
+            <a routerLink="/" class="btn btn-primary mt-4" (click)="gotoHomePage()">{{ t['mft_go_to_home'] || 'Go to Home' }}</a>
+        </div>
     </div>
-</div>
+</ng-container>
