@@ -2,12 +2,12 @@ import { Injectable } from '@angular/core';
 import { Resolve } from '@angular/router';
 import { getDatabase, ref, get, set } from 'firebase/database';
 import { initializeApp } from 'firebase/app';
-import { firebaseConfig } from './app.firebase.config';
 import { Gender, OrganizationChartNode, Relation } from './models/family-tree.model';
+import { firebaseProdConfig } from './config/firebase-prod.config';
 
 @Injectable({ providedIn: 'root' })
 export class FamilyTreeResolver implements Resolve<OrganizationChartNode[]> {
-  app = initializeApp(firebaseConfig);
+  app = initializeApp(firebaseProdConfig);
   db = getDatabase(this.app);
 
   async resolve(): Promise<OrganizationChartNode[]> {

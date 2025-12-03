@@ -1,13 +1,13 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, of, catchError, tap } from 'rxjs';
-import { firebaseConfig } from './app.firebase.config';
+import { firebaseProdConfig } from './config/firebase-prod.config';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ContentService {
-  private baseUrl = firebaseConfig.databaseURL + '/locale';
+  private baseUrl = firebaseProdConfig.databaseURL + '/locale';
   private cachedTranslations: Record<string, any> = {};
   public selectedLangCode: string = 'en';
 

@@ -7,8 +7,8 @@ import { provideAnimationsAsync } from '@angular/platform-browser/animations/asy
 import { providePrimeNG } from 'primeng/config';
 import { provideFirebaseApp, initializeApp } from '@angular/fire/app';
 import { provideAuth, getAuth } from '@angular/fire/auth'
-import { firebaseConfig } from './app.firebase.config';
 import { getFirestore, provideFirestore } from '@angular/fire/firestore';
+import { firebaseProdConfig } from './config/firebase-prod.config';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -19,7 +19,7 @@ export const appConfig: ApplicationConfig = {
       theme: { preset: Aura, options: { darkModeSelector: '.p-dark' } },
     }),
     provideFirebaseApp(() =>
-      initializeApp(firebaseConfig)
+      initializeApp(firebaseProdConfig)
     ),
     provideFirestore(() => getFirestore()),
     provideAuth(() => getAuth())

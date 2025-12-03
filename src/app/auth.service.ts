@@ -2,9 +2,9 @@ import { Injectable } from '@angular/core';
 import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail } from 'firebase/auth';
 import { initializeApp } from 'firebase/app';
 import { Firestore, doc, setDoc } from '@angular/fire/firestore';
-import { firebaseConfig } from './app.firebase.config';
+import { firebaseProdConfig } from './config/firebase-prod.config';
 
-const app = initializeApp(firebaseConfig);
+const app = initializeApp(firebaseProdConfig);
 const auth = getAuth(app);
 
 @Injectable({ providedIn: 'root' })
