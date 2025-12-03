@@ -1,12 +1,5 @@
 // src/app/config/firebase-prod.config.ts
 
-// This file is built when running npm run build -- --configuration=production
-export const firebaseProdConfig = {
-  apiKey: process.env['FIREBASE_API_KEY'],
-  authDomain: process.env['FIREBASE_AUTH_DOMAIN'],
-  databaseURL: process.env['FIREBASE_DATABASE_URL'], 
-  projectId: process.env['FIREBASE_PROJECT_ID'],
-  storageBucket: process.env['FIREBASE_STORAGE_BUCKET'],
-  messagingSenderId: process.env['FIREBASE_MESSAGING_SENDER_ID'],
-  appId: process.env['FIREBASE_APP_ID'],
-};
+// NOTE: The contents of this file are OVERWRITTEN by the 'setup-env.js' script 
+// during the automated production build to securely inject static secrets.
+export const firebaseProdConfig = {};

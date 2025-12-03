@@ -1,17 +1,15 @@
 import { Injectable } from '@angular/core';
-import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail } from 'firebase/auth';
-import { initializeApp } from 'firebase/app';
+import { authInstance } from './firebase-init';
+import { signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail } from 'firebase/auth';
 import { Firestore, doc, setDoc } from '@angular/fire/firestore';
-import { firebaseProdConfig } from './config/firebase-prod.config';
-
-const app = initializeApp(firebaseProdConfig);
-const auth = getAuth(app);
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-  constructor (private firestore: Firestore) {}
+  private auth = authInstance;
+  constructor(private firestore: Firestore) { }
+
   login(email: string, password: string) {
-    return signInWithEmailAndPassword(auth, email, password).then(userCredential => {
+    return signInWithEmailAndPassword(this.auth, email, password).then(userCredential => {
       sessionStorage.setItem('firebaseUser', JSON.stringify(userCredential.user));
     });
   }
@@ -22,11 +20,11 @@ export class AuthService {
   }
 
   signup(email: string, password: string) {
-    return createUserWithEmailAndPassword(auth, email, password);
+    return createUserWithEmailAndPassword(this.auth, email, password);
   }
 
   resetPassword(email: string) {
-    return sendPasswordResetEmail(auth, email);
+    return sendPasswordResetEmail(this.auth, email);
   }
 
   getCurrentUserId(): string | null {
@@ -36,6 +34,6 @@ export class AuthService {
 
   logout() {
     sessionStorage.removeItem('firebaseUser');
-    return auth.signOut();
+    return this.auth.signOut();
   }
 }

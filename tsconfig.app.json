@@ -12,6 +12,8 @@
     "src/main.ts"
   ],
   "include": [
-    "src/**/*.d.ts"
+    "src/**/*.d.ts",
+    "src/app/config/firebase-dev.config.ts", 
+    "src/app/config/firebase-prod.config.ts"
   ]
 }
