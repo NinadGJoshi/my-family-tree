@@ -37,15 +37,18 @@ export class LoginComponent implements OnInit {
       value: 'mr'
     }
   ];
-  selectedLangCode: string = 'en';
+  selectedLangCode!: string;
   loginPageContent$: Observable<any> | undefined;
   currentTranslations: any = {};
 
   constructor(private authService: AuthService, private router: Router, private contentService: ContentService) { }
 
   ngOnInit(): void {
+    this.selectedLangCode = this.contentService.selectedLangCode;
     this.loginPageContent$ = this.contentService.getTranslations().pipe(
-      tap(translations => (this.currentTranslations = translations))
+      tap(translations => {
+        this.currentTranslations = translations;
+      })
     );
   }
 
@@ -110,7 +113,10 @@ export class LoginComponent implements OnInit {
   }
 
   getSelectedLangCode($event: SelectButtonChangeEvent) {
-    this.selectedLangCode, this.contentService.selectedLangCode = $event.value;
+    if (!$event.value) return;
+    this.selectedLangCode = $event.value;
+    this.contentService.selectedLangCode = $event.value;
+    localStorage.setItem('defaultLocale', this.selectedLangCode);
     this.contentService.getTranslations().pipe(
       tap(translations => (this.loginPageContent$ = of(translations), this.currentTranslations = translations)),
       take(1)

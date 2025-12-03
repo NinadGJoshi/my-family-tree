@@ -9,9 +9,17 @@ import { firebaseConfig } from './firebase-init';
 export class ContentService {
   private baseUrl = firebaseConfig.databaseURL + '/locale';
   private cachedTranslations: Record<string, any> = {};
-  public selectedLangCode: string = 'en';
 
-  constructor(private http: HttpClient) {}
+  public selectedLangCode!: string;
+
+  constructor(private http: HttpClient) {
+    const defaultLocale: string | null = localStorage.getItem('defaultLocale');
+    if (defaultLocale && defaultLocale.length) {
+      this.selectedLangCode = defaultLocale;
+    } else {
+      this.selectedLangCode = 'en';
+    }
+  }
 
   getTranslations(): Observable<Record<string, string>> {
     const langCode = this.selectedLangCode;
