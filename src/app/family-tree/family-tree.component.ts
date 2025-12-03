@@ -13,12 +13,11 @@ import { ConfirmationService } from 'primeng/api';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { TooltipModule } from 'primeng/tooltip';
 import { ActivatedRoute } from '@angular/router';
-import { getDatabase, ref, set, onValue } from 'firebase/database';
-import { initializeApp } from 'firebase/app';
+import { ref, set, onValue } from 'firebase/database'; // Removed getDatabase
+import { dbInstance } from '../firebase-init'; 
 import { ContentService } from '../content.service';
 import { Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
-import { firebaseProdConfig } from '../config/firebase-prod.config';
 
 @Component({
   selector: 'family-tree',
@@ -49,17 +48,12 @@ export class FamilyTreeComponent implements OnInit {
   addingRelation = 'child';
   syncing = false;
   online = navigator.onLine;
-
-  // translations observable + shortcut object for template
   contentPage$!: Observable<any>;
   t: any = {};
-
-  // localized action labels (Add Parent / Add Sibling / Add Child)
   addParentLabel: string = 'Add Parent';
   addSiblingLabel: string = 'Add Sibling';
   addChildLabel: string = 'Add Child';
-
-  private db = getDatabase(initializeApp(firebaseProdConfig));
+  private db = dbInstance;
 
   form: FamilyMemberForm = {
     name: '',
@@ -512,6 +506,4 @@ export class FamilyTreeComponent implements OnInit {
     const day = String(date.getDate()).padStart(2, '0');
     return `${year}-${month}-${day}`;
   }
-
-
 }

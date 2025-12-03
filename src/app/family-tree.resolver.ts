@@ -1,28 +1,26 @@
 import { Injectable } from '@angular/core';
 import { Resolve } from '@angular/router';
-import { getDatabase, ref, get, set } from 'firebase/database';
-import { initializeApp } from 'firebase/app';
+import { dbInstance } from './firebase-init'; 
+
+import { ref, get, set } from 'firebase/database';
+
 import { Gender, OrganizationChartNode, Relation } from './models/family-tree.model';
-import { firebaseProdConfig } from './config/firebase-prod.config';
 
 @Injectable({ providedIn: 'root' })
 export class FamilyTreeResolver implements Resolve<OrganizationChartNode[]> {
-  app = initializeApp(firebaseProdConfig);
-  db = getDatabase(this.app);
+  private db = dbInstance; // Use the initialized DB instance
 
   async resolve(): Promise<OrganizationChartNode[]> {
     const user = JSON.parse(sessionStorage.getItem('firebaseUser') || '{}');
     const userId = user?.uid;
 
     if (!userId) return [];
-
     const treeRef = ref(this.db, `trees/${userId}`);
     const snapshot = await get(treeRef);
 
     if (snapshot.exists()) {
       return snapshot.val();
     } else {
-      // Create initial tree data
       const initialTree: OrganizationChartNode[] = [
         {
           label: 'Root Person',
