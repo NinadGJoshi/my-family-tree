@@ -1,5 +1,5 @@
 <ng-container *ngIf="(contentPage$ | async) as t">
-  <p-organizationChart [value]="data" selectionMode="single" (onNodeSelect)="onNodeClick($event)">
+  <p-organizationChart [value]="data" selectionMode="single" (onNodeSelect)="onNodeClick($event)" [collapsible]="true">
     <ng-template let-node pTemplate="person">
       <div class="card-node" [id]="node.data.name" [ngClass]="{ 'highlighted': (highlightedNode?.id) === node.name }"
         [pTooltip]="getTooltipContent(node.data)" [escape]="false" tooltipPosition="top" tooltipStyleClass="node-tooltip"

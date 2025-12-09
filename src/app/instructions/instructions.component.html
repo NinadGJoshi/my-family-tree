@@ -1,0 +1,121 @@
+<ng-container *ngIf="(translations$ | async) as t">
+<p-dialog 
+  header="{{ t['mft_instructions_title'] }}"
+  [(visible)]="isInstructionVisible"
+  [modal]="true"
+  [style]="{ width: '85vw', height: '85vh' }"
+  [draggable]="false"
+  [resizable]="false"
+  [maximizable]="true"
+  class="instructions-dialog"
+  (onHide)="onDialogClosed()"
+>
+
+  <div style="max-height:70vh; overflow-y:auto; padding-right:10px;">
+
+    <!-- TOP INTRO CARD -->
+    <p-card class="mb-3 shadow-sm">
+      <h2 class="m-0 text-center">
+        <i class="pi pi-sitemap mr-2"></i>
+        {{ t['mft_instructions_title'] }}
+      </h2>
+      <p class="text-center mt-2">
+        {{ t['mft_instructions_intro'] }}
+      </p>
+    </p-card>
+
+    <p-accordion [multiple]="true">  <!-- allow multiple open panels -->
+
+      <!-- Getting Started -->
+      <p-accordion-panel [value]="'start'">
+        <p-accordion-header>{{ t['mft_section_start_title'] }}</p-accordion-header>
+        <p-accordion-content>
+          <ol>
+            <li>{{ t['mft_section_start_step1'] }}</li>
+            <li>{{ t['mft_section_start_step2'] }}</li>
+            <li>{{ t['mft_section_start_step3'] }}</li>
+          </ol>
+        </p-accordion-content>
+      </p-accordion-panel>
+
+      <!-- Adding Family Members -->
+      <p-accordion-panel [value]="'addMembers'">
+        <p-accordion-header>{{ t['mft_section_add_member_title'] }}</p-accordion-header>
+        <p-accordion-content>
+          <p>{{ t['mft_section_add_member_detail'] }}</p>
+          <ul>
+            <li>{{ t['mft_section_add_child'] }}</li>
+            <li>{{ t['mft_section_add_parent'] }}</li>
+            <li>{{ t['mft_section_add_sibling'] }}</li>
+            <li>{{ t['mft_section_add_partner'] }}</li>
+          </ul>
+        </p-accordion-content>
+      </p-accordion-panel>
+
+      <!-- Editing Members -->
+      <p-accordion-panel [value]="'editMember'">
+        <p-accordion-header>{{ t['mft_section_edit_title'] }}</p-accordion-header>
+        <p-accordion-content>
+          <p>{{ t['mft_section_edit_step1'] }}</p>
+          <p>{{ t['mft_section_edit_step2'] }}</p>
+          <p>{{ t['mft_section_edit_step3'] }}</p>
+        </p-accordion-content>
+      </p-accordion-panel>
+
+      <!-- Deleting Members -->
+      <p-accordion-panel [value]="'deleteMember'">
+        <p-accordion-header>{{ t['mft_section_delete_title'] }}</p-accordion-header>
+        <p-accordion-content>
+          <ol>
+            <li>{{ t['mft_section_delete_step1'] }}</li>
+            <li>{{ t['mft_section_delete_step2'] }}</li>
+          </ol>
+        </p-accordion-content>
+      </p-accordion-panel>
+
+      <!-- Expand / Collapse Tree -->
+      <p-accordion-panel [value]="'expandCollapse'">
+        <p-accordion-header>{{ t['mft_section_expand_title'] }}</p-accordion-header>
+        <p-accordion-content>
+          <ol>
+            <li>{{ t['mft_section_expand_step1'] }}</li>
+            <li>{{ t['mft_section_expand_step2'] }}</li>
+          </ol>
+        </p-accordion-content>
+      </p-accordion-panel>
+
+      <!-- Import & Export -->
+      <p-accordion-panel [value]="'importExport'">
+        <p-accordion-header>{{ t['mft_section_import_export_title'] }}</p-accordion-header>
+        <p-accordion-content>
+          <p-card class="mb-3">
+            <h3><i class="pi pi-upload mr-2"></i>{{ t['mft_section_export'] }}</h3>
+            <p>{{ t['mft_section_export'] }}</p>
+          </p-card>
+          <p-card>
+            <h3><i class="pi pi-download mr-2"></i>{{ t['mft_section_import'] }}</h3>
+            <p>{{ t['mft_section_import'] }}</p>
+          </p-card>
+        </p-accordion-content>
+      </p-accordion-panel>
+
+      <!-- Firebase Sync -->
+      <p-accordion-panel [value]="'sync'">
+        <p-accordion-header>{{ t['mft_section_sync_title'] }}</p-accordion-header>
+        <p-accordion-content>
+          <p>{{ t['mft_section_sync_desc'] }}</p>
+        </p-accordion-content>
+      </p-accordion-panel>
+
+      <!-- Final Note -->
+      <p-accordion-panel [value]="'end'">
+        <p-accordion-header>{{ t['mft_section_end_title'] }}</p-accordion-header>
+        <p-accordion-content>
+          <p>{{ t['mft_section_end_desc'] }}</p>
+        </p-accordion-content>
+      </p-accordion-panel>
+
+    </p-accordion>
+  </div>
+</p-dialog>
+</ng-container>
