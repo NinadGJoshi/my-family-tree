@@ -257,10 +257,11 @@ export class FamilyTreeComponent implements OnInit {
     if (!this.selectedNode || !this.form.name) return;
 
     const formCopy = { ...this.form };
-    formCopy.dob = formCopy.dob;
+    formCopy.dob = null;
     formCopy.diedOn = formCopy.isAlive ? null : formCopy.diedOn;
-    formCopy.partnerDob = formCopy.partnerDob ? formCopy.partnerDob : null;
-    formCopy.partnerDiedOn = formCopy.partnerIsAlive ? null : formCopy.partnerDiedOn;
+    formCopy.partnerName = '';
+    formCopy.partnerDob = null;
+    formCopy.partnerDiedOn = null;
 
     const newNode: OrganizationChartNode = {
       label: this.form.name,

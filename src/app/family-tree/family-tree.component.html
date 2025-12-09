@@ -129,7 +129,7 @@
         </div>
       </div>
 
-      <div class="field">
+      <div class="field" *ngIf="!isEditMode">
         <label>{{ t['mft_add_as'] }}</label>
         <p-selectButton [options]="relationTypes" [(ngModel)]="addingRelation" optionLabel="label"
           optionValue="value"></p-selectButton>
@@ -139,7 +139,7 @@
         <div class="flex gap-2">
           <button pButton [label]="t['mft_save_details']" class="btn-save" (click)="saveDetails()"
             [disabled]="!isFormChanged()"></button>
-          <button pButton [label]="t['mft_add_member']" class="btn-add" (click)="addFamilyMember()" [disabled]="!form.name"></button>
+          <button *ngIf="!isEditMode" pButton [label]="t['mft_add_member']" class="btn-add" (click)="addFamilyMember()" [disabled]="!form.name"></button>
         </div>
         <button *ngIf="selectedNode && getTotalNodeCount(data) > 1" pButton [label]="t['mft_delete']" icon="pi pi-trash"
           class="p-button-danger" (click)="deleteNode(selectedNode)" pTooltip="{{ t['mft_delete_node'] || 'Delete Node' }}"
