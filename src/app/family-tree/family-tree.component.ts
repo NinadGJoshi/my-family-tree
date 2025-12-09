@@ -13,11 +13,12 @@ import { ConfirmationService } from 'primeng/api';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { TooltipModule } from 'primeng/tooltip';
 import { ActivatedRoute } from '@angular/router';
-import { ref, set, onValue } from 'firebase/database'; // Removed getDatabase
+import { ref, set, onValue, update } from 'firebase/database'; // Removed getDatabase
 import { dbInstance } from '../firebase-init'; 
 import { ContentService } from '../content.service';
 import { Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
+import { UniqueIdService } from '../unique-id.service';
 
 @Component({
   selector: 'family-tree',
@@ -87,7 +88,8 @@ export class FamilyTreeComponent implements OnInit {
     private route: ActivatedRoute,
     private confirmationService: ConfirmationService,
     private renderer: Renderer2,
-    private contentService: ContentService
+    private contentService: ContentService,
+    private uniqueIdService: UniqueIdService
   ) {
     window.addEventListener('online', () => this.syncPendingChanges());
   }
@@ -147,6 +149,7 @@ export class FamilyTreeComponent implements OnInit {
         expanded: true,
         isRootNode: true,
         data: {
+          nodeId: this.uniqueIdService.generateSixDigitId(), 
           name: 'Root Person',
           gender: Gender.Male,
           dob: new Date().toString(),
@@ -187,6 +190,7 @@ export class FamilyTreeComponent implements OnInit {
     if (!d) return;
 
     this.form = {
+      nodeId: d.nodeId,
       name: d.name || '',
       gender: d.gender || Gender.Male,
       dob: d.dob ? new Date(d.dob) : null,
@@ -243,6 +247,7 @@ export class FamilyTreeComponent implements OnInit {
     updated.diedOn = updated.isAlive ? null : (updated.diedOn ? this.convertToYYYYMMDD(updated.diedOn) : null);
     updated.partnerDob = updated.partnerDob ? this.convertToYYYYMMDD(updated.partnerDob) : null;
     updated.partnerDiedOn = updated.partnerIsAlive ? null : (updated.partnerDiedOn ? this.convertToYYYYMMDD(updated.partnerDiedOn) : null);
+    updated.nodeId = updated.nodeId ? updated.nodeId : '';
 
     this.selectedNode.label = updated.name ? updated.name : undefined;
     this.selectedNode.data = updated;
@@ -251,12 +256,14 @@ export class FamilyTreeComponent implements OnInit {
     this.showForm = false;
     this.isEditMode = false;
     this.closeDialog();
+    this.syncTree();
   }
 
   addFamilyMember() {
     if (!this.selectedNode || !this.form.name) return;
 
     const formCopy = { ...this.form };
+    formCopy.nodeId = this.uniqueIdService.generateSixDigitId();
     formCopy.dob = null;
     formCopy.diedOn = formCopy.isAlive ? null : formCopy.diedOn;
     formCopy.partnerName = '';
@@ -456,6 +463,7 @@ export class FamilyTreeComponent implements OnInit {
 
   getTooltipContent(data: FamilyMemberForm): string {
     // Use translation keys where possible; fallback to English phrases
+    const nodeIdLabel = this.t?.mft_node_id ? `${this.t.mft_node_id}: ` : '';
     const nameLabel = this.t?.mft_name ? `${this.t.mft_name}: ` : '';
     const dobLabel = this.t?.mft_dob ? `${this.t.mft_dob}: ` : 'DOB: ';
     const statusLabel = this.t?.mft_is_alive ? `${this.t.mft_is_alive}: ` : 'Status: ';
@@ -467,7 +475,8 @@ export class FamilyTreeComponent implements OnInit {
 
     return `
       <div>
-        <div><b>${data.name}</b></div>
+        <div><b>${nodeIdLabel}${data.nodeId}</b></div>
+        <div><b>${nameLabel}${data.name}</b></div>
         <div>${dobLabel}${data.dob || '-'}</div>
         <div>${statusLabel}${data.isAlive ? (this.t?.mft_alive ?? 'Alive') : (this.t?.mft_dead ?? 'Deceased')}</div>
         ${!data.isAlive && data.diedOn ? `<div>${diedOnLabel}${data.diedOn}</div>` : ''}
