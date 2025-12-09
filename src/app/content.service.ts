@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, of, catchError, tap, lastValueFrom } from 'rxjs';
+import { Observable, of, catchError, tap, lastValueFrom, shareReplay } from 'rxjs';
 import { firebaseConfig } from './firebase-init';
 
 @Injectable({
@@ -35,7 +35,8 @@ export class ContentService {
       catchError(err => {
         console.error(`Failed to load translations for ${langCode}:`, err);
         return of({});
-      })
+      }),
+      shareReplay(1)
     );
   }
 

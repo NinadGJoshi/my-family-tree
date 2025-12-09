@@ -5,12 +5,16 @@ import { dbInstance } from './firebase-init';
 import { ref, get, set } from 'firebase/database';
 
 import { Gender, OrganizationChartNode, Relation } from './models/family-tree.model';
+import { UniqueIdService } from './unique-id.service';
 
 @Injectable({ providedIn: 'root' })
 export class FamilyTreeResolver implements Resolve<OrganizationChartNode[]> {
   private db = dbInstance; // Use the initialized DB instance
 
+  constructor(private uniqueIdService: UniqueIdService) {}
+
   async resolve(): Promise<OrganizationChartNode[]> {
+
     const user = JSON.parse(sessionStorage.getItem('firebaseUser') || '{}');
     const userId = user?.uid;
 
@@ -29,6 +33,7 @@ export class FamilyTreeResolver implements Resolve<OrganizationChartNode[]> {
           isRootNode: true,
           expanded: true,
           data: {
+            nodeId: this.uniqueIdService.generateSixDigitId(),
             name: 'Root Person',
             gender: Gender.Male,
             dob: (new Date().toString()),

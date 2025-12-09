@@ -11,6 +11,7 @@ export enum Relation {
 }
 
 export interface FamilyMemberForm {
+  nodeId?: string;
   name: string;
   gender: Gender | null;
   dob: Date | string | null;
