@@ -7,10 +7,11 @@ import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { Observable, of, take, tap } from 'rxjs';
 import { ContentService } from '../content.service';
+import { InstructionsComponent } from '../instructions/instructions.component';
 
 @Component({
   selector: 'app-home',
-  imports: [ButtonModule, FamilyTreeComponent, FormsModule, CommonModule],
+  imports: [ButtonModule, FamilyTreeComponent, FormsModule, CommonModule, InstructionsComponent],
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss'
 })
@@ -21,6 +22,7 @@ export class HomeComponent implements OnInit {
   selectedLangCode: string = 'en';
   homeContentPage$: Observable<any> | undefined;
   currentTranslations: any = {};
+  isInstructionVisible: boolean = false;
 
   @ViewChild(FamilyTreeComponent) familyTreeComponent!: FamilyTreeComponent;
 
@@ -137,5 +139,13 @@ export class HomeComponent implements OnInit {
     this.searchQuery = '';
     this.searchMatches = [];
     this.currentMatchIndex = 0;
+  }
+
+  showInstuctions() {
+    this.isInstructionVisible = !this.isInstructionVisible;
+  }
+
+  handleInstructionClose() {
+   this.isInstructionVisible = false;
   }
 }

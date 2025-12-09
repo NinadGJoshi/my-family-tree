@@ -11,49 +11,20 @@
       <!-- Right section: Buttons -->
       <div class="flex justify-end items-center gap-x-3 mt-3 md:mt-0">
         <div class="p-inputgroup max-w-md mx-auto">
-          <input
-            type="text"
-            pInputText
-            [(ngModel)]="searchQuery"
-            [placeholder]="t['mft_search_by_name']"
-            class="border border-gray-300 rounded px-2 py-1 text-sm"
-            (keydown.enter)="searchNode()"
-          />
+          <input type="text" pInputText [(ngModel)]="searchQuery" [placeholder]="t['mft_search_by_name']"
+            class="border border-gray-300 rounded px-2 py-1 text-sm" (keydown.enter)="searchNode()" />
 
-          <button
-            *ngIf="searchQuery"
-            pButton
-            icon="pi pi-times"
-            class="p-button-link p-button-sm"
-            (click)="clearSearch()"
-            [title]="t['mft_clear']"
-          ></button>
+          <button *ngIf="searchQuery" pButton icon="pi pi-times" class="p-button-link p-button-sm"
+            (click)="clearSearch()" [title]="t['mft_clear']"></button>
 
-          <button
-            pButton
-            icon="pi pi-search"
-            class="p-button-link p-button-sm"
-            (click)="searchNode()"
-            [title]="t['mft_search']"
-          ></button>
+          <button pButton icon="pi pi-search" class="p-button-link p-button-sm" (click)="searchNode()"
+            [title]="t['mft_search']"></button>
 
-          <button
-            *ngIf="searchMatches.length > 1"
-            pButton
-            icon="pi pi-angle-double-left"
-            class="p-button-link p-button-sm"
-            (click)="prevMatch()"
-            [title]="t['mft_previous_match']"
-          ></button>
+          <button *ngIf="searchMatches.length > 1" pButton icon="pi pi-angle-double-left"
+            class="p-button-link p-button-sm" (click)="prevMatch()" [title]="t['mft_previous_match']"></button>
 
-          <button
-            *ngIf="searchMatches.length > 1"
-            pButton
-            icon="pi pi-angle-double-right"
-            class="p-button-link p-button-sm"
-            (click)="nextMatch()"
-            [title]="t['mft_next_match']"
-          ></button>
+          <button *ngIf="searchMatches.length > 1" pButton icon="pi pi-angle-double-right"
+            class="p-button-link p-button-sm" (click)="nextMatch()" [title]="t['mft_next_match']"></button>
         </div>
 
         <button pButton class="p-button-sm p-button-secondary flex items-center gap-2" (click)="downloadTreeAsJson()">
@@ -67,12 +38,11 @@
           <span>{{ t['mft_upload'] }}</span>
         </button>
 
-        <button
-          pButton
-          [label]="t['mft_logout']"
-          (click)="logout()"
-          class="p-button-sm p-button-danger"
-        ></button>
+        <button pButton icon="pi pi-info-circle" [label]="t['mft_instructions_button_label']"
+          class="p-button-sm p-button-secondary flex items-center gap-2" (click)="showInstuctions()">
+        </button>
+
+        <button pButton [label]="t['mft_logout']" (click)="logout()" class="p-button-sm p-button-danger"></button>
       </div>
     </header>
 
@@ -84,3 +54,5 @@
     </div>
   </div>
 </ng-container>
+
+<app-instructions [isInstructionVisible]="isInstructionVisible" (dialogCloseEvent)="handleInstructionClose()"></app-instructions>
