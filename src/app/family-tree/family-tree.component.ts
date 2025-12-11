@@ -149,7 +149,7 @@ export class FamilyTreeComponent implements OnInit {
         expanded: true,
         isRootNode: true,
         data: {
-          nodeId: this.uniqueIdService.generateSixDigitId(), 
+          nodeId: this.uniqueIdService.generateSixDigitId(),
           name: 'Root Person',
           gender: Gender.Male,
           dob: new Date().toString(),
@@ -291,12 +291,16 @@ export class FamilyTreeComponent implements OnInit {
         this.selectedNode.isRootNode = false;
         break;
       case 'parent':
-        const index = this.data.indexOf(this.selectedNode);
-        if (index > -1) this.data.splice(index, 1);
-        newNode.children = [this.selectedNode];
-        this.selectedNode.isRootNode = false;
-        newNode.isRootNode = true;
-        this.data.push(newNode);
+        if (this.selectedNode.isRootNode) {
+          newNode.children = [this.selectedNode];
+          this.selectedNode.isRootNode = false;
+          this.data.push(newNode);
+        } else {
+          const updatedTree = this.insertNewParentAboveSiblings(this.data[0], this.selectedNode?.data?.nodeId ?? '', newNode);
+          if (updatedTree && updatedTree.children) {
+            this.data = [updatedTree];
+          }
+        }
         break;
     }
 
@@ -515,5 +519,49 @@ export class FamilyTreeComponent implements OnInit {
     const month = String(date.getMonth() + 1).padStart(2, '0');
     const day = String(date.getDate()).padStart(2, '0');
     return `${year}-${month}-${day}`;
+  }
+
+  private findNodeParentAndIndex(
+    current: OrganizationChartNode,
+    targetId: string
+  ): { parent: OrganizationChartNode, index: number } | null {
+    if (!current.children || current.children.length === 0 || !targetId) {
+      return null;
+    }
+
+    const index = current.children.findIndex(child => (child?.data?.nodeId === targetId));
+
+    if (index !== -1) {
+      return { parent: current, index: index };
+    }
+
+    for (const child of current.children) {
+      const found = this.findNodeParentAndIndex(child, targetId);
+      if (found) {
+        return found;
+      }
+    }
+
+    return null;
+  }
+
+  private insertNewParentAboveSiblings(
+    root: OrganizationChartNode,
+    selectedNodeId: string,
+    newNode: OrganizationChartNode
+  ): OrganizationChartNode | null {
+    if (root.data?.nodeId === selectedNodeId && root.isRootNode) {
+      return null;
+    }
+    const result = this.findNodeParentAndIndex(root, selectedNodeId);
+    if (!result) {
+      return null;
+    }
+    const { parent } = result;
+    const siblingsToReparent: OrganizationChartNode[] = parent.children ? [...parent.children] : [];
+    newNode.children = siblingsToReparent;
+    newNode.isRootNode = false;
+    parent.children = [newNode];
+    return root;
   }
 }
